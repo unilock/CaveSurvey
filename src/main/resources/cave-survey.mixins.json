@@ -1,0 +1,23 @@
+{
+  "required": true,
+  "package": "ir.mehradn.cavesurvey.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "ItemFrameMixin",
+    "MapItemMixin",
+    "accessor.MapItemAccessor",
+    "cartography.CartographyTableMenu$3Mixin",
+    "cartography.CartographyTableMenu$4Mixin",
+    "cartography.CartographyTableMenuMixin"
+  ],
+  "client": [
+    "client.CartographyTableScreenMixin",
+    "client.ItemFrameRendererMixin",
+    "client.ItemInHandRendererMixin",
+    "client.ItemStackMixin",
+    "client.accessor.CartographyTableScreenAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

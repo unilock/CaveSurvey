@@ -1,48 +1,71 @@
 plugins {
-	id 'net.fabricmc.fabric-loom-remap' version '1.15-SNAPSHOT' apply false
+    id 'java'
+	id 'net.fabricmc.fabric-loom-remap' version '1.15-SNAPSHOT'
 }
 
-subprojects {
-    apply plugin: "net.fabricmc.fabric-loom-remap"
+version = project.mod_version
+group = project.maven_group
 
-    dependencies {
-        minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
-        mappings loom.layered() {
-            officialMojangMappings()
-            parchment("org.parchmentmc.data:parchment-${rootProject.parchment_version}@zip")
+base {
+    archivesName = project.archives_base_name
+}
+
+loom {
+    mods {
+        "cave-survey" {
+            sourceSet sourceSets.main
         }
-
-        modImplementation "net.fabricmc:fabric-loader:${rootProject.loader_version}"
     }
 }
 
-allprojects {
-    apply plugin: "java"
+repositories {
+//    maven {
+//        name 'Nucleoid'
+//        url 'https://maven.nucleoid.xyz'
+//    }
+    maven {
+        name 'ParchmentMC'
+        url 'https://maven.parchmentmc.org'
+    }
+}
 
-    version = rootProject.mod_version
-    group = rootProject.maven_group
-
-    repositories {
-        maven {
-            name 'ParchmentMC'
-            url 'https://maven.parchmentmc.org'
-        }
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.layered() {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${project.parchment_version}@zip")
     }
 
-    tasks.withType(JavaCompile).configureEach {
-        it.options.release = 21
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+//    modImplementation include("eu.pb4:polymer-core:${project.polymer_version}")
+//    modImplementation include("eu.pb4:polymer-resource-pack:${project.polymer_version}")
+//    modImplementation include("xyz.nucleoid:server-translations-api:${project.translation_version}")
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = 'UTF-8'
+    it.options.release = 21
+}
+
+java {
+    withSourcesJar()
+
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
     }
+}
 
-    java {
-        withSourcesJar()
-
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
-
-    jar {
-        from("LICENSE") {
-            rename { "${it}_${rootProject.archivesBaseName}" }
-        }
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.base.archivesName.get()}" }
     }
 }

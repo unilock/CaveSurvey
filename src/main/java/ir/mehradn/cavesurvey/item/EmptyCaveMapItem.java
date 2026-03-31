@@ -1,0 +1,44 @@
+package ir.mehradn.cavesurvey.item;
+
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.stats.Stats;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ComplexItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.MapItem;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
+import org.jetbrains.annotations.NotNull;
+
+public class EmptyCaveMapItem extends ComplexItem {
+    public EmptyCaveMapItem(Properties properties) {
+        super(properties);
+    }
+
+    @Override
+    public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
+        ItemStack stack = player.getItemInHand(usedHand);
+        if (level.isClientSide)
+            return InteractionResultHolder.success(stack);
+
+        if (!player.getAbilities().instabuild)
+            stack.shrink(1);
+
+        player.awardStat(Stats.ITEM_USED.get(this));
+        player.level().playSound(null, player, SoundEvents.UI_CARTOGRAPHY_TABLE_TAKE_RESULT, player.getSoundSource(), 1.0f, 1.0f);
+        player.level().playSound(null, player, SoundEvents.SCULK_CLICKING, player.getSoundSource(), 1.0f, 1.0f);
+
+        ItemStack newStack = CaveMapItem.create(level, player.getBlockX(), player.getBlockZ(), (byte)0, true, false);
+        MapItemSavedData data = MapItem.getSavedData(newStack, level);
+        if (data != null)
+            CaveMapItem.updateMap(level, player, data, 0);
+
+        if (stack.isEmpty())
+            return InteractionResultHolder.consume(newStack);
+        if (!player.getInventory().add(newStack.copy()))
+            player.drop(newStack, false);
+        return InteractionResultHolder.consume(stack);
+    }
+}

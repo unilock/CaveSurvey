@@ -9,8 +9,4 @@ pluginManagement {
     }
 }
 
-include "common"
-include "client"
-include "server"
-
 rootProject.name = "cave-survey"
