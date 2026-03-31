@@ -1,5 +1,7 @@
 package ir.mehradn.cavesurvey;
 
+import eu.pb4.polymer.core.api.other.PolymerComponent;
+import ir.mehradn.cavesurvey.component.ModDataComponents;
 import ir.mehradn.cavesurvey.event.ItemGroupModification;
 import ir.mehradn.cavesurvey.event.LootTableModification;
 import ir.mehradn.cavesurvey.event.OverworldStore;
@@ -17,6 +19,8 @@ public class CaveSurvey implements ModInitializer {
     @Override
     public void onInitialize() {
         LOGGER.info("Registering cave-survey...");
+        LOGGER.info("Registering components...");
+        ModDataComponents.register();
         LOGGER.info("Registering items...");
         ModItems.register();
         LOGGER.info("Registering special recipes...");
@@ -27,6 +31,8 @@ public class CaveSurvey implements ModInitializer {
         LootTableModification.register();
         LOGGER.info("Registering polymer assets...");
         ModItems.registerAssets();
+        LOGGER.info("Registering polymer components...");
+        PolymerComponent.registerDataComponent(ModDataComponents.CAVE_SURVEY);
         LOGGER.info("Registering cave-survey completed!");
     }
 
