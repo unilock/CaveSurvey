@@ -7,7 +7,6 @@ loom {
 }
 
 dependencies {
-    include "com.github.LlamaLad7:MixinExtras:${rootProject.mixin_extras_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_version}"
 
     implementation include(project(path: ":common", configuration: "namedElements")) { transitive false }
