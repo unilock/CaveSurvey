@@ -1,9 +1,9 @@
 plugins {
-	id 'fabric-loom' version '1.15-SNAPSHOT' apply false
+	id 'net.fabricmc.fabric-loom-remap' version '1.15-SNAPSHOT' apply false
 }
 
 subprojects {
-    apply plugin: "fabric-loom"
+    apply plugin: "net.fabricmc.fabric-loom-remap"
 
     dependencies {
         minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
