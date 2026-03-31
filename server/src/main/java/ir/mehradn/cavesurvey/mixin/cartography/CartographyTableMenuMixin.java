@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(CartographyTableMenu.class)
@@ -45,12 +46,14 @@ public abstract class CartographyTableMenuMixin extends AbstractContainerMenu {
         return original.call(instance, item);
     }
 
+    @Unique
     private void setupResultSlotForCaveMaps(ItemStack map, ItemStack upgradeItem, ItemStack output) {
         this.access.execute(((level, blockPos) -> {
             ItemStack newStack = null;
             for (ServerCaveMapUpgrade upgrade : ServerCaveMapUpgrade.ALL_UPGRADES) {
                 if (upgrade.acceptsItem(upgradeItem) && upgrade.valid(map, level)) {
-                    newStack = upgrade.upgrade(map);
+                    // TODO: cannot be null!
+                    newStack = upgrade.upgrade(map, null);
                     this.broadcastChanges();
                     break;
                 }

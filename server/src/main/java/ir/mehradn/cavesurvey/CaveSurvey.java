@@ -5,6 +5,7 @@ import ir.mehradn.cavesurvey.event.LootTableModification;
 import ir.mehradn.cavesurvey.item.ModItems;
 import ir.mehradn.cavesurvey.item.crafting.ModRecipes;
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,5 +26,9 @@ public class CaveSurvey implements ModInitializer {
         LOGGER.info("Registering polymer assets...");
         ModItems.registerAssets();
         LOGGER.info("Registering cave-survey completed!");
+    }
+
+    public static ResourceLocation rl(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
 }

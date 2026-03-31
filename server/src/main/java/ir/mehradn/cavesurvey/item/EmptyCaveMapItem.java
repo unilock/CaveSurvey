@@ -4,7 +4,6 @@ import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import ir.mehradn.cavesurvey.CaveSurvey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.stats.Stats;
@@ -18,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class EmptyCaveMapItem extends ComplexItem implements PolymerItem {
     public static final PolymerModelData MODEL_DATA = PolymerResourcePackUtils.requestModel(Items.MAP,
-        new ResourceLocation(CaveSurvey.MOD_ID, "item/cave_map"));
+        CaveSurvey.rl("item/cave_map"));
 
     public EmptyCaveMapItem(Properties properties) {
         super(properties);

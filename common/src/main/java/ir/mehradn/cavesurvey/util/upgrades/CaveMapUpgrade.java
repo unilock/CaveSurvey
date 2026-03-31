@@ -1,11 +1,13 @@
 package ir.mehradn.cavesurvey.util.upgrades;
 
 import ir.mehradn.cavesurvey.util.CaveMapTagManager;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.MapItem;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 
 public interface CaveMapUpgrade {
@@ -17,7 +19,7 @@ public interface CaveMapUpgrade {
 
     boolean valid(ItemStack mapStack, Level level);
 
-    ItemStack upgrade(ItemStack mapStack);
+    ItemStack upgrade(ItemStack mapStack, Level level);
 
     interface Cloning extends CaveMapUpgrade {
         @Override
@@ -42,7 +44,7 @@ public interface CaveMapUpgrade {
         }
 
         @Override
-        default ItemStack upgrade(ItemStack mapStack) {
+        default ItemStack upgrade(ItemStack mapStack, Level level) {
             ItemStack newStack = mapStack.copyWithCount(2);
             CaveMapTagManager.setSightLevel(mapStack, 0);
             return newStack;
@@ -72,9 +74,14 @@ public interface CaveMapUpgrade {
         }
 
         @Override
-        default ItemStack upgrade(ItemStack mapStack) {
+        default ItemStack upgrade(ItemStack mapStack, Level level) {
             ItemStack newStack = mapStack.copyWithCount(1);
-            newStack.getOrCreateTag().putInt(MapItem.MAP_SCALE_TAG, 1);
+            MapItemSavedData mapItemSavedData = MapItem.getSavedData(mapStack, level);
+            if (mapItemSavedData != null) {
+                MapId mapId = level.getFreeMapId();
+                level.setMapData(mapId, mapItemSavedData.scaled());
+                newStack.set(DataComponents.MAP_ID, mapId);
+            }
             return newStack;
         }
     }
@@ -102,7 +109,7 @@ public interface CaveMapUpgrade {
         }
 
         @Override
-        default ItemStack upgrade(ItemStack mapStack) {
+        default ItemStack upgrade(ItemStack mapStack, Level level) {
             int newVision = CaveMapTagManager.getSightLevel(mapStack) + 1;
             ItemStack newStack = mapStack.copyWithCount(1);
             CaveMapTagManager.setSightLevel(newStack, newVision);
@@ -133,9 +140,15 @@ public interface CaveMapUpgrade {
         }
 
         @Override
-        default ItemStack upgrade(ItemStack mapStack) {
+        default ItemStack upgrade(ItemStack mapStack, Level level) {
             ItemStack newStack = mapStack.copyWithCount(1);
-            newStack.getOrCreateTag().putBoolean(MapItem.MAP_LOCK_TAG, true);
+            MapItemSavedData mapItemSavedData = MapItem.getSavedData(mapStack, level);
+            if (mapItemSavedData != null) {
+                MapId mapId = level.getFreeMapId();
+                MapItemSavedData mapItemSavedData2 = mapItemSavedData.locked();
+                level.setMapData(mapId, mapItemSavedData2);
+                newStack.set(DataComponents.MAP_ID, mapId);
+            }
             CaveMapTagManager.setSightLevel(newStack, 0);
             return newStack;
         }

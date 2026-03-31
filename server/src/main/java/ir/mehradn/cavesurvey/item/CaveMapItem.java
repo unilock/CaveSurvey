@@ -8,15 +8,14 @@ import eu.pb4.polymer.core.api.item.PolymerItemUtils;
 import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import ir.mehradn.cavesurvey.CaveSurvey;
-import ir.mehradn.cavesurvey.mixin.accessor.ItemStackAccessor;
 import ir.mehradn.cavesurvey.mixin.accessor.MapItemAccessor;
 import ir.mehradn.cavesurvey.util.CaveMapTagManager;
 import ir.mehradn.cavesurvey.util.CaveMappingAlgorithm;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.Mth;
@@ -25,16 +24,20 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.MapPostProcessing;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 
 public class CaveMapItem extends MapItem implements PolymerItem {
     public static final int MAP_SIZE = 128;
     public static final PolymerModelData MODEL_DATA = PolymerResourcePackUtils.requestModel(Items.FILLED_MAP,
-        new ResourceLocation(CaveSurvey.MOD_ID, "item/filled_cave_map"));
+        CaveSurvey.rl("item/filled_cave_map"));
 
     public CaveMapItem(Properties properties) {
         super(properties);
@@ -42,7 +45,7 @@ public class CaveMapItem extends MapItem implements PolymerItem {
 
     public static ItemStack create(Level level, int x, int z, byte scale, boolean trackingPosition, boolean unlimitedTracking) {
         ItemStack stack = new ItemStack(ModItems.FILLED_CAVE_MAP);
-        MapItemAccessor.invokeCreateAndStoreSavedData(stack, level, x, z, scale, trackingPosition, unlimitedTracking, level.dimension());
+        stack.set(DataComponents.MAP_ID, MapItemAccessor.invokeCreateNewSavedData(level, x, z, scale, trackingPosition, unlimitedTracking, level.dimension()));
         CaveMapTagManager.setSightLevel(stack, 0);
         return stack;
     }
@@ -174,17 +177,17 @@ public class CaveMapItem extends MapItem implements PolymerItem {
     }
 
     public int countHoverText(ItemStack stack, Level level) {
-        if (!ItemStackAccessor.invokeShouldShowInTooltip(((ItemStackAccessor)(Object)stack).invokeGetHideFlags(), ItemStack.TooltipPart.ADDITIONAL))
+        if (!stack.has(DataComponents.HIDE_ADDITIONAL_TOOLTIP))
             return -1;
 
-        Integer id = getMapId(stack);
-        MapItemSavedData data = (id == null ? null : MapItem.getSavedData(id, level));
-        CompoundTag tag = stack.getTag();
-        if (id == null || data == null || tag == null)
+        MapId mapId = stack.get(DataComponents.MAP_ID);
+        MapItemSavedData data = (mapId == null ? null : MapItem.getSavedData(mapId, level));
+        MapPostProcessing mapPostProcessing = stack.get(DataComponents.MAP_POST_PROCESSING);
+        if (mapId == null || data == null || mapPostProcessing == null)
             return 0;
 
         int count = 1;
-        if (!stack.hasCustomHoverName())
+        if (!stack.has(DataComponents.CUSTOM_NAME))
             count++;
         return count;
     }
@@ -195,11 +198,11 @@ public class CaveMapItem extends MapItem implements PolymerItem {
     }
 
     @Override
-    public ItemStack getPolymerItemStack(ItemStack stack, TooltipFlag context, ServerPlayer player) {
-        ItemStack out = PolymerItemUtils.createItemStack(stack, context, player);
-        Integer id = getMapId(stack);
-        if (id != null)
-            MapItemAccessor.invokeStoreMapData(out, id);
+    public ItemStack getPolymerItemStack(ItemStack stack, TooltipFlag context, HolderLookup.Provider lookup, @Nullable ServerPlayer player) {
+        ItemStack out = PolymerItemUtils.createItemStack(stack, context, lookup, player);
+        MapId mapId = stack.get(DataComponents.MAP_ID);
+        if (mapId != null)
+            out.set(DataComponents.MAP_ID, mapId);
         CaveMapTagManager.setSightLevel(out, CaveMapTagManager.getSightLevel(stack));
         CaveMapTagManager.setLore(out, countHoverText(stack, player.level()));
         return out;
@@ -224,16 +227,16 @@ public class CaveMapItem extends MapItem implements PolymerItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
-        Integer id = getMapId(stack);
-        MapItemSavedData data = (id == null ? null : MapItem.getSavedData(id, level));
-        CompoundTag tag = stack.getTag();
-        if (id == null || data == null || tag == null)
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        MapId mapId = stack.get(DataComponents.MAP_ID);
+        MapItemSavedData data = (mapId == null ? null : context.mapData(mapId));
+        MapPostProcessing mapPostProcessing = stack.get(DataComponents.MAP_POST_PROCESSING);
+        if (mapId == null || data == null || mapPostProcessing == null)
             return;
 
-        boolean toBeLocked = tag.getBoolean(MapItem.MAP_LOCK_TAG);
-        if (!stack.hasCustomHoverName())
-            tooltipComponents.add(Component.literal("#" + id).withStyle(ChatFormatting.GRAY));
+        boolean toBeLocked = MapPostProcessing.LOCK.equals(mapPostProcessing);
+        if (!stack.has(DataComponents.CUSTOM_NAME))
+            tooltipComponents.add(Component.literal("#" + mapId).withStyle(ChatFormatting.GRAY));
         if (data.locked || toBeLocked)
             tooltipComponents.add(Component.translatable("filled_map.locked").withStyle(ChatFormatting.GRAY));
         else {

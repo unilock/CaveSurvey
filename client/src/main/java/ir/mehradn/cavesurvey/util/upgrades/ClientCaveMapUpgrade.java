@@ -5,15 +5,17 @@ import ir.mehradn.cavesurvey.mixin.client.accessor.CartographyTableScreenAccesso
 import ir.mehradn.cavesurvey.util.CaveMapTagManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public interface ClientCaveMapUpgrade extends CaveMapUpgrade {
     ResourceLocation CARTOGRAPHY_TEXTURE =
-        new ResourceLocation(CaveSurveyClient.MOD_ID, "textures/gui/container/cave_cartography_table.png");
+        CaveSurveyClient.rl("textures/gui/container/cave_cartography_table.png");
     Cloning CLONING = new Cloning();
     Extending EXTENDING = new Extending();
     Improving IMPROVING = new Improving();
@@ -70,7 +72,7 @@ public interface ClientCaveMapUpgrade extends CaveMapUpgrade {
 
         @Override
         public void renderResultingMap(GuiGraphics guiGraphics, ItemStack mapStack, int leftPos, int topPos, MapRenderer mapRenderer) {
-            ItemStack newStack = upgrade(mapStack);
+            ItemStack newStack = upgrade(mapStack, Minecraft.getInstance().level);
             renderCurrentMap(guiGraphics, newStack, leftPos, topPos, mapRenderer);
         }
     }

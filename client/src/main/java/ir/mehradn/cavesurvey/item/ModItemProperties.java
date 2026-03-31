@@ -13,7 +13,7 @@ import net.minecraft.world.item.Items;
 
 @Environment(EnvType.CLIENT)
 public class ModItemProperties {
-    public static final ResourceLocation CLIENT_CAVE_MAP_PROPERTY = new ResourceLocation(CaveSurveyClient.MOD_ID, "cave");
+    public static final ResourceLocation CLIENT_CAVE_MAP_PROPERTY = CaveSurveyClient.rl("cave");
 
     public static void register() {
         ItemProperties.register(Items.MAP, CLIENT_CAVE_MAP_PROPERTY, ModItemProperties::clientCaveMapProperty);

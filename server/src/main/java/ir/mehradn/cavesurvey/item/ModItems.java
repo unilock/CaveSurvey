@@ -4,7 +4,6 @@ import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import ir.mehradn.cavesurvey.CaveSurvey;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 
@@ -22,6 +21,6 @@ public class ModItems {
     }
 
     private static void registerItem(String name, Item item) {
-        Registry.register(BuiltInRegistries.ITEM, new ResourceLocation(CaveSurvey.MOD_ID, name), item);
+        Registry.register(BuiltInRegistries.ITEM, CaveSurvey.rl(name), item);
     }
 }

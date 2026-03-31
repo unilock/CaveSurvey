@@ -4,6 +4,7 @@ import ir.mehradn.cavesurvey.item.ModItemProperties;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,5 +19,9 @@ public class CaveSurveyClient implements ClientModInitializer {
         LOGGER.info("Registering item properties...");
         ModItemProperties.register();
         LOGGER.info("Registering cave-survey-client completed!");
+    }
+    
+    public static ResourceLocation rl(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
 }

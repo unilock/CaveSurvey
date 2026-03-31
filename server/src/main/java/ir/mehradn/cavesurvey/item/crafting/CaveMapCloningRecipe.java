@@ -3,27 +3,27 @@ package ir.mehradn.cavesurvey.item.crafting;
 import eu.pb4.polymer.core.api.item.PolymerRecipe;
 import ir.mehradn.cavesurvey.item.ModItems;
 import ir.mehradn.cavesurvey.util.upgrades.ServerCaveMapUpgrade;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
 public class CaveMapCloningRecipe extends CustomRecipe implements PolymerRecipe {
-    public CaveMapCloningRecipe(ResourceLocation resourceLocation, CraftingBookCategory craftingBookCategory) {
-        super(resourceLocation, craftingBookCategory);
+    public CaveMapCloningRecipe(CraftingBookCategory craftingBookCategory) {
+        super(craftingBookCategory);
     }
 
-    public boolean matches(CraftingContainer inv, Level level) {
+    @Override
+    public boolean matches(CraftingInput input, Level level) {
         ItemStack filled = null;
         int empty = 0;
         int other = 0;
-        for (int i = 0; i < inv.getContainerSize(); i++) {
-            ItemStack stack = inv.getItem(i);
+        for (int i = 0; i < input.size(); i++) {
+            ItemStack stack = input.getItem(i);
             if (stack.is(ModItems.FILLED_CAVE_MAP)) {
                 if (filled != null)
                     return false;
@@ -37,12 +37,13 @@ public class CaveMapCloningRecipe extends CustomRecipe implements PolymerRecipe 
         return filled != null && empty > 0 && other == 0 && ServerCaveMapUpgrade.CLONING.valid(filled, level);
     }
 
-    public @NotNull ItemStack assemble(CraftingContainer inv, RegistryAccess registryAccess) {
+    @Override
+    public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
         ItemStack filled = null;
         int empty = 0;
         int other = 0;
-        for (int i = 0; i < inv.getContainerSize(); i++) {
-            ItemStack stack = inv.getItem(i);
+        for (int i = 0; i < input.size(); i++) {
+            ItemStack stack = input.getItem(i);
             if (stack.is(ModItems.FILLED_CAVE_MAP)) {
                 if (filled != null)
                     return ItemStack.EMPTY;
@@ -56,7 +57,8 @@ public class CaveMapCloningRecipe extends CustomRecipe implements PolymerRecipe 
 
         if (filled == null || empty == 0 && other > 0)
             return ItemStack.EMPTY;
-        ItemStack cloned = ServerCaveMapUpgrade.CLONING.upgrade(filled);
+        // TODO: cannot be null!
+        ItemStack cloned = ServerCaveMapUpgrade.CLONING.upgrade(filled, null);
         cloned.setCount(empty + 1);
         return cloned;
     }

@@ -14,6 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.CartographyTableMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -32,11 +33,11 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
         super(abstractContainerMenu, inventory, component);
     }
 
-    @Shadow protected abstract void renderMap(GuiGraphics guiGraphics, @Nullable Integer mapId, @Nullable MapItemSavedData mapData, int x, int y,
+    @Shadow protected abstract void renderMap(GuiGraphics guiGraphics, @Nullable MapId mapId, @Nullable MapItemSavedData mapData, int x, int y,
                                               float scale);
 
-    @WrapOperation(method = "renderBg", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/CartographyTableScreen;renderResultingMap(Lnet/minecraft/client/gui/GuiGraphics;Ljava/lang/Integer;Lnet/minecraft/world/level/saveddata/maps/MapItemSavedData;ZZZZ)V"))
-    private void renderResultingCaveMap(CartographyTableScreen instance, GuiGraphics guiGraphics, Integer mapId, MapItemSavedData mapData,
+    @WrapOperation(method = "renderBg", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/CartographyTableScreen;renderResultingMap(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/level/saveddata/maps/MapId;Lnet/minecraft/world/level/saveddata/maps/MapItemSavedData;ZZZZ)V"))
+    private void renderResultingCaveMap(CartographyTableScreen instance, GuiGraphics guiGraphics, MapId mapId, MapItemSavedData mapData,
                                         boolean hasMap, boolean hasPaper, boolean hasGlassPane, boolean isMaxSize, Operation<Void> original) {
         assert this.minecraft != null;
         ItemStack mapStack = this.menu.slots.get(0).getItem();
@@ -62,7 +63,7 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
             ClientCaveMapUpgrade.IMPROVING.renderCurrentMap(guiGraphics, mapStack, this.leftPos, this.topPos, mapRenderer);
     }
 
-    @Inject(method = "renderBg", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/MapItem;getMapId(Lnet/minecraft/world/item/ItemStack;)Ljava/lang/Integer;"))
+    @Inject(method = "renderBg", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/MapItem;getSavedData(Lnet/minecraft/world/level/saveddata/maps/MapId;Lnet/minecraft/world/level/Level;)Lnet/minecraft/world/level/saveddata/maps/MapItemSavedData;"))
     private void renderDisabledUpgrade(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY, CallbackInfo ci) {
         assert this.minecraft != null;
         ItemStack mapStack = this.menu.slots.get(0).getItem();
