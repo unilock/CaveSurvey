@@ -2,6 +2,7 @@ package ir.mehradn.cavesurvey.mixin.cartography;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import ir.mehradn.cavesurvey.event.OverworldStore;
 import ir.mehradn.cavesurvey.item.ModItems;
 import ir.mehradn.cavesurvey.util.CaveMapTagManager;
 import ir.mehradn.cavesurvey.util.upgrades.ServerCaveMapUpgrade;
@@ -52,8 +53,7 @@ public abstract class CartographyTableMenuMixin extends AbstractContainerMenu {
             ItemStack newStack = null;
             for (ServerCaveMapUpgrade upgrade : ServerCaveMapUpgrade.ALL_UPGRADES) {
                 if (upgrade.acceptsItem(upgradeItem) && upgrade.valid(map, level)) {
-                    // TODO: cannot be null!
-                    newStack = upgrade.upgrade(map, null);
+                    newStack = upgrade.upgrade(map, OverworldStore.get());
                     this.broadcastChanges();
                     break;
                 }

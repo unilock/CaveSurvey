@@ -1,6 +1,7 @@
 package ir.mehradn.cavesurvey.item.crafting;
 
 import eu.pb4.polymer.core.api.item.PolymerRecipe;
+import ir.mehradn.cavesurvey.event.OverworldStore;
 import ir.mehradn.cavesurvey.item.ModItems;
 import ir.mehradn.cavesurvey.util.upgrades.ServerCaveMapUpgrade;
 import net.minecraft.core.HolderLookup;
@@ -57,8 +58,7 @@ public class CaveMapCloningRecipe extends CustomRecipe implements PolymerRecipe 
 
         if (filled == null || empty == 0 && other > 0)
             return ItemStack.EMPTY;
-        // TODO: cannot be null!
-        ItemStack cloned = ServerCaveMapUpgrade.CLONING.upgrade(filled, null);
+        ItemStack cloned = ServerCaveMapUpgrade.CLONING.upgrade(filled, OverworldStore.get());
         cloned.setCount(empty + 1);
         return cloned;
     }

@@ -1,6 +1,7 @@
 package ir.mehradn.cavesurvey.item.crafting;
 
 import eu.pb4.polymer.core.api.item.PolymerRecipe;
+import ir.mehradn.cavesurvey.event.OverworldStore;
 import ir.mehradn.cavesurvey.item.ModItems;
 import ir.mehradn.cavesurvey.util.upgrades.ServerCaveMapUpgrade;
 import net.minecraft.core.HolderLookup;
@@ -46,8 +47,7 @@ public class CaveMapUpgradeRecipe <T extends ServerCaveMapUpgrade> extends Shape
         for (int i = 0; i < input.size(); i++) {
             ItemStack stack = input.getItem(i);
             if (stack.is(ModItems.FILLED_CAVE_MAP))
-                // TODO: cannot be null!
-                return this.upgrade.upgrade(stack, null);
+                return this.upgrade.upgrade(stack, OverworldStore.get());
         }
         return ItemStack.EMPTY;
     }
