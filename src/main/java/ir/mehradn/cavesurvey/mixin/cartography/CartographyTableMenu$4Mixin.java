@@ -17,7 +17,7 @@ public abstract class CartographyTableMenu$4Mixin extends Slot {
     @ModifyReturnValue(method = "mayPlace", at = @At("RETURN"))
     private boolean acceptCaveMapUpgrades(boolean original, ItemStack stack) {
         for (ServerCaveMapUpgrade upgrade : ServerCaveMapUpgrade.ALL_UPGRADES)
-            original = (original || upgrade.acceptsItem(stack));
+            original |= upgrade.acceptsItem(stack);
         return original;
     }
 }
